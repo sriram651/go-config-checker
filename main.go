@@ -91,7 +91,7 @@ func main() {
 	}
 
 	if isValidConfig {
-		fmt.Println("All required keys are present!")
+		fmt.Println("config is valid")
 		os.Exit(0)
 	} else {
 		os.Exit(1)
