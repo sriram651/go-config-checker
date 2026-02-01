@@ -7,28 +7,46 @@ import (
 	"os"
 )
 
+type Schema struct {
+	Required map[string]string
+}
+
 func main() {
 	configPath := flag.String("config", "", "path to config file")
-	// schemaPath := flag.String("schema", "", "path to schema file")
+	schemaPath := flag.String("schema", "", "path to schema file")
 	flag.Parse()
 
-	fileBytes, err := os.ReadFile(*configPath)
+	configFileBytes, err := os.ReadFile(*configPath)
 
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
 
-	fmt.Println("Byte length:", len(fileBytes))
-
 	var config map[string]interface{}
 
-	unmarshalErr := json.Unmarshal(fileBytes, &config)
+	unmarshalErr := json.Unmarshal(configFileBytes, &config)
 
 	if unmarshalErr != nil {
 		fmt.Println("Error while unmarshalling the json:", unmarshalErr)
 		os.Exit(2)
 	}
 
-	fmt.Println("The config is:", config)
+	schemaFileBytes, schemaFileErr := os.ReadFile(*schemaPath)
+
+	if schemaFileErr != nil {
+		fmt.Println("Error while reading schema.json:", schemaFileErr)
+		os.Exit(1)
+	}
+
+	var schemaBytes Schema
+
+	schemaUnmarshalErr := json.Unmarshal(schemaFileBytes, &schemaBytes)
+
+	if schemaUnmarshalErr != nil {
+		fmt.Println("Error unmarshalling schema.json:", schemaUnmarshalErr)
+		os.Exit(2)
+	}
+
+	fmt.Println("Required keys:", len(schemaBytes.Required))
 }
