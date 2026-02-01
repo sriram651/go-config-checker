@@ -49,4 +49,12 @@ func main() {
 	}
 
 	fmt.Println("Required keys:", len(schemaBytes.Required))
+
+	for key := range schemaBytes.Required {
+		_, ok := config[key]
+
+		if ok != true {
+			fmt.Println("Missing key:", key)
+		}
+	}
 }
