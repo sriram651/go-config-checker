@@ -50,11 +50,17 @@ func main() {
 
 	fmt.Println("Required keys:", len(schemaBytes.Required))
 
+	isValidConfig := true
 	for key := range schemaBytes.Required {
 		_, ok := config[key]
 
 		if ok != true {
 			fmt.Println("Missing key:", key)
+			isValidConfig = false
 		}
+	}
+
+	if isValidConfig {
+		fmt.Println("All required keys are present!")
 	}
 }
