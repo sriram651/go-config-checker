@@ -20,7 +20,7 @@ func main() {
 
 	if err != nil {
 		fmt.Println(err)
-		os.Exit(1)
+		os.Exit(2)
 	}
 
 	var config map[string]interface{}
@@ -36,7 +36,7 @@ func main() {
 
 	if schemaFileErr != nil {
 		fmt.Println("Error while reading schema.json:", schemaFileErr)
-		os.Exit(1)
+		os.Exit(2)
 	}
 
 	var schemaBytes Schema
@@ -52,15 +52,43 @@ func main() {
 
 	isValidConfig := true
 	for key := range schemaBytes.Required {
-		_, ok := config[key]
+		val, ok := config[key]
 
-		if ok != true {
+		if !ok {
 			fmt.Println("Missing key:", key)
+			isValidConfig = false
+			continue
+		}
+
+		typeInSchema := schemaBytes.Required[key]
+
+		// compare type
+		switch val.(type) {
+		case string:
+			if schemaBytes.Required[key] != "string" {
+				fmt.Printf("type mismatch for %s, expected %s but received string\n", key, typeInSchema)
+				isValidConfig = false
+			}
+		case float64:
+			if schemaBytes.Required[key] != "number" {
+				fmt.Printf("type mismatch for %s, expected %s but received float64\n", key, typeInSchema)
+				isValidConfig = false
+			}
+		case bool:
+			if schemaBytes.Required[key] != "bool" {
+				fmt.Printf("type mismatch for %s, expected %s but received boolean\n", key, typeInSchema)
+				isValidConfig = false
+			}
+		default:
+			fmt.Println("unknown schema type:", typeInSchema)
 			isValidConfig = false
 		}
 	}
 
 	if isValidConfig {
 		fmt.Println("All required keys are present!")
+		os.Exit(0)
+	} else {
+		os.Exit(1)
 	}
 }
