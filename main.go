@@ -16,6 +16,11 @@ func main() {
 	schemaPath := flag.String("schema", "", "path to schema file")
 	flag.Parse()
 
+	if *configPath == "" || *schemaPath == "" {
+		fmt.Println("error: --config and --schema are required")
+		os.Exit(2)
+	}
+
 	configFileBytes, err := os.ReadFile(*configPath)
 
 	if err != nil {
